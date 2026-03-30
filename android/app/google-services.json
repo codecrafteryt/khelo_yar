@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "672107757830",
+    "project_id": "kheloyaar-d3e9d",
+    "storage_bucket": "kheloyaar-d3e9d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:672107757830:android:2d2afbe78005ee498dde87",
+        "android_client_info": {
+          "package_name": "com.kheloyaar.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "672107757830-tesma186m89ivhi9ktk9fqurfja2krnk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMbYnd3styPjUDgXP_uvtb0WMRRqN-2pg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "672107757830-tesma186m89ivhi9ktk9fqurfja2krnk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
