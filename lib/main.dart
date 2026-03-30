@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
       splitScreenMode: false,
       builder: (_, context){
         return GetMaterialApp(
-          title: 'Node Chat',
+          title: 'KheloYaar',
           debugShowCheckedModeBanner: false,
           defaultTransition: Transition.leftToRight,
           home: SplashScreen(),

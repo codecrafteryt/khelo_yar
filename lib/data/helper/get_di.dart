@@ -10,6 +10,7 @@
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:khelo_yar/controller/auth_controller.dart';
+import 'package:khelo_yar/data/auth_repo/auth_repo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api_provider.dart';
 
@@ -18,9 +19,13 @@ class DependencyInjection {
     final sharedPreferences = await SharedPreferences.getInstance();
     Get.lazyPut(() => sharedPreferences, fenix: true);
     Get.lazyPut(() => ApiProvider());
-    //Get.lazyPut(() => AuthRepo(apiProvider: Get.find(),),);
-    //Get.lazyPut(() => AccountController(accountRepo: Get.find(), sharedPreferences: Get.find()), fenix: true);
-    Get.lazyPut(() => AuthController(authRepo: Get.find(), sharedPreferences: Get.find(),), fenix: true);
-
+    Get.lazyPut(() => AuthRepo(apiProvider: Get.find()));
+    Get.lazyPut(
+      () => AuthController(
+        authRepo: Get.find(),
+        sharedPreferences: Get.find(),
+      ),
+      fenix: true,
+    );
   }
 }

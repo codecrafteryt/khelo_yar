@@ -9,4 +9,5 @@
 
 class MyImages {
   static const String braelo_app = "assets/images/braelo_app.png";
+  static const String kheloYaarLogo = "assets/images/kheloyaarlogo.png";
 }

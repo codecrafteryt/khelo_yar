@@ -10,6 +10,9 @@
 import 'dart:ui';
 
 class MyColors {
+  /// KheloYaar brand teal — primary CTA backgrounds (e.g. Continue, Create account).
+  static const Color brandPrimary = Color(0xFF007782);
+
   // Primary Colors
   static const Color primary =
       Color.fromRGBO(251, 188, 27, 1); // rgba(255, 192, 0, 1)
@@ -66,6 +69,11 @@ class MyColors {
   static const Color grayscale80 = Color(0xFF000000); // rgba(0, 0, 0, 1)
   static const Color grayscale90 = Color(0xFF1B1B1B); // rgba(27, 27, 27, 1)
   static const Color grayscale100 = Color(0xFF212121); // rgba(33, 33, 33, 1)
+
+  /// Input borders, dividers (Airbnb-style light chrome).
+  static const Color borderSubtle = Color(0xFFDDDDDD);
+  static const Color textSecondary = Color(0xFF717171);
+  static const Color scaffoldMuted = Color(0xFFF7F7F7);
 
   MyColors._();
 }

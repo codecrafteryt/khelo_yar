@@ -10,8 +10,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import '../../utils/extensions/extentions.dart';
 import '../../utils/values/my_color.dart';
+import 'auth/login/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -24,8 +26,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // _checkLoginStatus();
-   // statusCheck();
+    Future<void>.delayed(const Duration(milliseconds: 1800), () {
+      if (!mounted) return;
+      Get.off(() => const LoginScreen());
+    });
   }
 
   // // Method to check login status and navigate accordingly
