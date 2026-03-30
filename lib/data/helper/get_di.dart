@@ -1,0 +1,26 @@
+/*
+  ---------------------------------------
+  Project: khelo yar Mobile Application
+  Date: March 30, 2026
+  Author: Ameer Salman
+  ---------------------------------------
+  Description: di here
+*/
+
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:khelo_yar/controller/auth_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../api_provider.dart';
+
+class DependencyInjection {
+  static void init() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    Get.lazyPut(() => sharedPreferences, fenix: true);
+    Get.lazyPut(() => ApiProvider());
+    //Get.lazyPut(() => AuthRepo(apiProvider: Get.find(),),);
+    //Get.lazyPut(() => AccountController(accountRepo: Get.find(), sharedPreferences: Get.find()), fenix: true);
+    Get.lazyPut(() => AuthController(authRepo: Get.find(), sharedPreferences: Get.find(),), fenix: true);
+
+  }
+}
