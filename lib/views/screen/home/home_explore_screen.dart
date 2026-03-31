@@ -3,17 +3,15 @@
   KheloYaar — Airbnb-style explore: full-bleed map + draggable listing sheet.
 */
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../../controller/map_controller.dart';
 import '../../../data/models/explore_venue.dart';
-import '../../../utils/values/airbnb_map_style.dart';
 import '../../../utils/values/my_color.dart';
 import '../../../utils/values/my_fonts.dart';
+import '../map/map.dart';
 import '../../widgets/explore_venue_sheet_tile.dart';
 
 /// Mock venues (Pakistan) — replace with API later.
@@ -93,18 +91,13 @@ class HomeExploreScreen extends StatefulWidget {
 }
 
 class _HomeExploreScreenState extends State<HomeExploreScreen> {
-  static const LatLng _kPakistanRoughCenter = LatLng(24.86, 67.01);
-
-  final Completer<GoogleMapController> _mapController = Completer<GoogleMapController>();
+  final MapController _mapController = Get.find();
   final DraggableScrollableController _sheetController = DraggableScrollableController();
-
-  String? _selectedVenueId;
-  late Set<Marker> _markers;
 
   @override
   void initState() {
     super.initState();
-    _markers = _buildMarkers(_filteredVenues);
+    _mapController.initialize(kExploreMockVenues, _onVenueFocused);
   }
 
   @override
@@ -113,41 +106,15 @@ class _HomeExploreScreenState extends State<HomeExploreScreen> {
     super.dispose();
   }
 
-  Set<Marker> _buildMarkers(List<ExploreVenue> venues) {
-    return venues.map((v) {
-      final isSel = v.id == _selectedVenueId;
-      return Marker(
-        markerId: MarkerId(v.id),
-        position: LatLng(v.lat, v.lng),
-        zIndex: isSel ? 2 : 1,
-        icon: BitmapDescriptor.defaultMarkerWithHue(
-          isSel ? BitmapDescriptor.hueAzure : BitmapDescriptor.hueCyan,
-        ),
-        onTap: () => _onVenueFocused(v),
-      );
-    }).toSet();
-  }
-
   List<ExploreVenue> get _filteredVenues {
-    if (_selectedSportFilter == null || _selectedSportFilter == 'All') {
-      return kExploreMockVenues;
-    }
-    return kExploreMockVenues
-        .where((v) => v.sport.toLowerCase() == _selectedSportFilter!.toLowerCase())
-        .toList();
+    return _mapController.filteredVenues(kExploreMockVenues);
   }
-
-  String? _selectedSportFilter = 'All';
 
   Future<void> _onVenueFocused(ExploreVenue v) async {
     setState(() {
-      _selectedVenueId = v.id;
-      _markers = _buildMarkers(_filteredVenues);
+      _mapController.selectVenue(v, _filteredVenues, _onVenueFocused);
     });
-    final controller = await _mapController.future;
-    await controller.animateCamera(
-      CameraUpdate.newLatLngZoom(LatLng(v.lat, v.lng), 14.2),
-    );
+    await _mapController.animateToVenue(v);
   }
 
   @override
@@ -156,36 +123,21 @@ class _HomeExploreScreenState extends State<HomeExploreScreen> {
     final bottomPad = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
-      backgroundColor: MyColors.scaffoldMuted,
+      backgroundColor: MyColors.white,
       body: Stack(
         fit: StackFit.expand,
         children: [
           Positioned.fill(
-            child: GoogleMap(
-              initialCameraPosition: const CameraPosition(
-                target: _kPakistanRoughCenter,
-                zoom: 10.2,
-              ),
-              style: kAirbnbLikeMapStyle,
-              markers: _markers,
-              mapToolbarEnabled: false,
-              zoomControlsEnabled: false,
-              myLocationButtonEnabled: false,
-              compassEnabled: false,
-              liteModeEnabled: false,
-              onMapCreated: (c) {
-                if (!_mapController.isCompleted) {
-                  _mapController.complete(c);
-                }
-              },
-              onTap: (_) {
+            child: ExploreMapView(
+              mapController: _mapController,
+              onMapTap: () {
                 setState(() {
-                  _selectedVenueId = null;
-                  _markers = _buildMarkers(_filteredVenues);
+                  _mapController.clearSelection(_filteredVenues, _onVenueFocused);
                 });
               },
             ),
           ),
+
           DraggableScrollableSheet(
             controller: _sheetController,
             initialChildSize: 0.36,
@@ -284,8 +236,8 @@ class _HomeExploreScreenState extends State<HomeExploreScreen> {
                             child: ListView(
                               scrollDirection: Axis.horizontal,
                               padding: EdgeInsets.symmetric(horizontal: 16.w),
-                              children: _sportFilters.map((label) {
-                                final selected = _selectedSportFilter == label;
+                              children: MapController.sportFilters.map((label) {
+                                final selected = _mapController.selectedSportFilter == label;
                                 return Padding(
                                   padding: EdgeInsets.only(right: 8.w),
                                   child: FilterChip(
@@ -301,18 +253,11 @@ class _HomeExploreScreenState extends State<HomeExploreScreen> {
                                     selected: selected,
                                     onSelected: (_) {
                                       setState(() {
-                                        _selectedSportFilter = label;
-                                        _selectedVenueId = null;
-                                        final venues = label == 'All'
-                                            ? kExploreMockVenues
-                                            : kExploreMockVenues
-                                                .where(
-                                                  (v) =>
-                                                      v.sport.toLowerCase() ==
-                                                      label.toLowerCase(),
-                                                )
-                                                .toList();
-                                        _markers = _buildMarkers(venues);
+                                        _mapController.applySportFilter(
+                                          label,
+                                          kExploreMockVenues,
+                                          _onVenueFocused,
+                                        );
                                       });
                                     },
                                     backgroundColor: MyColors.white,
@@ -392,14 +337,6 @@ class _HomeExploreScreenState extends State<HomeExploreScreen> {
       ),
     );
   }
-
-  static const List<String> _sportFilters = [
-    'All',
-    'Futsal',
-    'Indoor cricket',
-    'Badminton',
-    'Padel',
-  ];
 }
 
 class _RoundIconButton extends StatelessWidget {
