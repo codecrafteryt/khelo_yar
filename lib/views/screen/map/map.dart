@@ -27,8 +27,9 @@ class ExploreMapView extends StatelessWidget {
     return GoogleMap(
       initialCameraPosition: const CameraPosition(
         target: MapController.pakistanRoughCenter,
-        zoom: 10.2,
+        zoom: MapController.zoomSheetExpanded,
       ),
+      padding: mapController.mapPadding,
       style: kAirbnbLikeMapStyle,
       markers: mapController.markers,
       mapToolbarEnabled: false,
