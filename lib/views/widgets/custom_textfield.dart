@@ -105,10 +105,7 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      height: height ?? 50,
-      child: Padding(
+    return Padding(
         padding: padding,
         child: TextFormField(
           controller: controller,
@@ -138,7 +135,7 @@ class CustomTextField extends StatelessWidget {
             labelText: labelText,
             floatingLabelBehavior: floatingLabelBehavior,
             hintText: hintText,
-            contentPadding: contentPadding,
+            contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 13),
             hintStyle: TextStyle(
               color: hintColor,
               fontSize: fontSize,
@@ -199,7 +196,6 @@ class CustomTextField extends StatelessWidget {
           validator: validator,
           obscureText: isObscureText,
         ),
-      ),
-    );
+      );
   }
 }

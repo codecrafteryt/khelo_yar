@@ -1,9 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import '../../../../controller/auth_controller.dart';
 import 'package:khelo_yar/utils/extensions/extentions.dart';
 import 'package:pinput/pinput.dart';
 import '../../../../utils/values/my_color.dart';
@@ -11,34 +9,14 @@ import '../../../../utils/values/my_fonts.dart';
 import '../../../widgets/custom_app_bar.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/custom_leading_icon.dart';
-import '../auth_navigation.dart';
 import 'forgot_password_re_enter_password_screen.dart';
 
 class ForgotPasswordOtpScreen extends StatelessWidget {
-   ForgotPasswordOtpScreen({super.key});
-
-  // Timer-related variables
-  final RxInt _timer = 0.obs; // Timer observable to control countdown
-  Timer? _resendTimer; // Timer object
-
-  // Function to start the countdown
-  void _startTimer() {
-    _timer.value = 30; // Reset timer to 30 seconds when starting
-    _resendTimer?.cancel(); // Cancel any existing timers to avoid conflicts
-
-    // Start the countdown timer that updates every second
-    _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_timer.value > 0) {
-        _timer.value--; // Decrement the timer value
-      } else {
-        timer.cancel(); // Stop the timer when it reaches zero
-      }
-    });
-  }
+  ForgotPasswordOtpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController verifyEmailOtpController = TextEditingController();
+    final AuthController authController = Get.find();
     final defaultPinTheme = PinTheme(
       width: 56.w,
       height: 56.h,
@@ -83,7 +61,7 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
 
                     CustomAppBar(
                       leading: CustomLeadingIcon(
-                        onPressed: () => Get.back(),
+                        onPressed: authController.goBack,
                       ),
                       title: Text(
                         "Confirm your code",
@@ -130,13 +108,16 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
                       child: Pinput(
-                        controller: verifyEmailOtpController,
-                        length: 6,
-                        defaultPinTheme: defaultPinTheme,
-                        focusedPinTheme: focusedPinTheme,
-                        submittedPinTheme: submittedPinTheme,
-                        showCursor: true,
-                      ),
+                          controller: authController.otpController,
+                          length: AuthController.otpLength,
+                          defaultPinTheme: defaultPinTheme,
+                          focusedPinTheme: focusedPinTheme,
+                          submittedPinTheme: submittedPinTheme,
+                          showCursor: true,
+                          onChanged: authController.onOtpChanged,
+                          pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
+                          validator: (_) => authController.showOtpError.value ? '' : null,
+                        ),
                     ),
 
                     30.sbh,
@@ -156,14 +137,20 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
                             ),
                           ),
                           GestureDetector(
-                            onTap: (){},
-                            child: Text(
-                              'Resend code',
-                              style: TextStyle(
-                                fontFamily: MyFonts.plusJakartaSans,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w700,
-                                color: MyColors.blackDark,
+                            onTap: authController.onResendOtp,
+                            child: Obx(
+                              () => Text(
+                                authController.otpResendTimer.value > 0
+                                    ? 'Resend code (${authController.otpResendTimer.value}s)'
+                                    : 'Resend code',
+                                style: TextStyle(
+                                  fontFamily: MyFonts.plusJakartaSans,
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: authController.otpResendTimer.value > 0
+                                      ? const Color.fromRGBO(145, 148, 155, 1)
+                                      : MyColors.blackDark,
+                                ),
                               ),
                             ),
                           ),
@@ -187,8 +174,9 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
                 textColor: MyColors.white,
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w700,
-                onPressed: () {
-                  Get.to(() => ForgotPasswordReEnterPasswordScreen(),);
+                onPressed: (){
+                 // authController.onOtpContinue;
+                  Get.to(() => const ForgotPasswordReEnterPasswordScreen());
                 },
               ),
             ),

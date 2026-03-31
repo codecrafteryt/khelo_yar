@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import '../../../../controller/auth_controller.dart';
 import 'package:khelo_yar/utils/extensions/extentions.dart';
-import 'package:khelo_yar/views/screen/auth/forgot_password/forgot_password_otp_screen.dart';
-
 import '../../../../utils/values/my_color.dart';
 import '../../../../utils/values/my_fonts.dart';
 import '../../../widgets/custom_app_bar.dart';
@@ -19,7 +17,7 @@ class ForgotPasswordScreen extends StatelessWidget {
   static const _hintColor = Color.fromRGBO(211, 211, 211, 1);
   @override
   Widget build(BuildContext context) {
-    final _forgotController = TextEditingController();
+    final AuthController authController = Get.find();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -28,10 +26,7 @@ class ForgotPasswordScreen extends StatelessWidget {
           children: [
             CustomAppBar(
               leading: CustomLeadingIcon(
-                onPressed: (){
-                  // controller.clearSignupFields();
-                  Get.back();
-                },
+                onPressed: authController.goBack,
               ),
               title: Text("Reset your Password",
                 style: TextStyle(
@@ -42,7 +37,7 @@ class ForgotPasswordScreen extends StatelessWidget {
               ),
             ),
             Form(
-              //key: ,
+              key: authController.forgotPasswordFormKey,
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h + MediaQuery.of(context).padding.bottom),
                   child: Column(
@@ -64,51 +59,39 @@ class ForgotPasswordScreen extends StatelessWidget {
                         ),
                       ),
                       40.sbh,
-                      Form(
-                       // key: controller.formKey2,
-                        child: Column(
-                          children: [
-                            CustomTextField(
-                              floatingLabelBehavior: FloatingLabelBehavior.always,
-                              labelText: 'Email',
-                              hintText: 'you@example.com',
-                              controller: _forgotController,
-                              keyboardType: TextInputType.emailAddress,
-                              borderRadius: 12.r,
-                              padding: EdgeInsets.zero,
-                              borderColor: _defaultBorder,
-                              focusedBorderColor: Colors.black,
-                              enabledBorderWidth: 0.5,
-                              focusedBorderWidth: 1,
-                              errorBorderColor: _errorColor,
-                              errorBorderWidth: 1,
-                              focusedErrorBorderWidth: 1,
-                              hintColor: _hintColor,
-                              textColor: Colors.black,
-                              cursorColor: Colors.black,
-                              fillColor: Colors.transparent,
-                              focusedFillColor: Colors.transparent,
+                      Column(
+                        children: [
+                          CustomTextField(
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                            labelText: 'Email',
+                            hintText: 'you@example.com',
+                            controller: authController.forgotEmailController,
+                            keyboardType: TextInputType.emailAddress,
+                            borderRadius: 12.r,
+                            padding: EdgeInsets.zero,
+                            borderColor: _defaultBorder,
+                            focusedBorderColor: Colors.black,
+                            enabledBorderWidth: 0.5,
+                            focusedBorderWidth: 1,
+                            errorBorderColor: _errorColor,
+                            errorBorderWidth: 1,
+                            focusedErrorBorderWidth: 1,
+                            hintColor: _hintColor,
+                            textColor: Colors.black,
+                            cursorColor: Colors.black,
+                            fillColor: Colors.transparent,
+                            focusedFillColor: Colors.transparent,
+                            fontSize: 14.sp,
+                            hintFontWeight: FontWeight.w400,
+                            labelColor: Colors.black,
+                            floatingLabelStyle: TextStyle(
+                              fontFamily: MyFonts.plusJakartaSans,
                               fontSize: 14.sp,
-                              hintFontWeight: FontWeight.w400,
-                              labelColor: Colors.black,
-                              floatingLabelStyle: TextStyle(
-                                fontFamily: MyFonts.plusJakartaSans,
-                                fontSize: 14.sp,
-                                color: Colors.black,
-                              ),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
-                              validator: (v) {
-                                if (v == null || v.trim().isEmpty) {
-                                  return 'Please enter your email';
-                                }
-                                if (!v.contains('@')) {
-                                  return 'Enter a valid email';
-                                }
-                                return null;
-                              },
+                              color: Colors.black,
                             ),
-                          ],
-                        ),
+                           // validator: authController.validateEmail,
+                          ),
+                        ],
                       ),
                       20.sbh,
                       CustomButton(
@@ -120,9 +103,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                         textColor: MyColors.white,
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
-                            onPressed: () {
-                              Get.to(() => ForgotPasswordOtpScreen(),);
-                            },
+                        onPressed: authController.onForgotPasswordContinue,
                           ),
 
                     ],

@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import '../../../../controller/auth_controller.dart';
 import '../../../../utils/extensions/extentions.dart';
 import '../../../../utils/values/my_color.dart';
 import '../../../../utils/values/my_fonts.dart';
@@ -19,46 +19,17 @@ import '../../../widgets/custom_button.dart';
 import '../../../widgets/custom_leading_icon.dart';
 import '../../../widgets/custom_textfield.dart';
 import '../../../widgets/google_auth_button.dart';
-import '../../home/bottom_nav_bar.dart';
-import '../auth_navigation.dart';
 
-class SignUpScreen extends StatefulWidget {
+class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
 
-  @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
-}
-
-class _SignUpScreenState extends State<SignUpScreen> {
   static const _errorColor = Color.fromRGBO(240, 66, 72, 1);
   static const _defaultBorder = Color.fromRGBO(145, 148, 155, 1);
   static const _hintColor = Color.fromRGBO(211, 211, 211, 1);
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  void _onCreateAccount() {
-    if (_formKey.currentState?.validate() ?? false) {
-      // UI-only
-    }
-  }
-
-  void _onGoogle() {
-    Get.to(() => NavBar());
-  }
 
   @override
   Widget build(BuildContext context) {
+    final AuthController authController = Get.find();
     final bottomInset = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
@@ -68,10 +39,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           children: [
             CustomAppBar(
               leading: CustomLeadingIcon(
-                onPressed: (){
-                  // controller.clearSignupFields();
-                  Get.back();
-                },
+                onPressed: authController.goBack,
               ),
               title: Text("Signup",
                 style: TextStyle(
@@ -85,7 +53,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: SingleChildScrollView(
                 padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h + bottomInset),
                   child: Form(
-                    key: _formKey,
+                    key: authController.signUpFormKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -104,7 +72,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                           labelText: 'Full name',
                           hintText: 'Muhammad Ali',
-                          controller: _nameController,
+                          controller: authController.signUpNameController,
                           borderRadius: 12.r,
                           padding: EdgeInsets.zero,
                           borderColor: _defaultBorder,
@@ -127,20 +95,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             fontSize: 14.sp,
                             color: Colors.black,
                           ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
-                          validator: (v) {
-                            if (v == null || v.trim().isEmpty) {
-                              return 'Please enter your name';
-                            }
-                            return null;
-                          },
+                          validator: authController.validateName,
                         ),
                         17.sbh,
                         CustomTextField(
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                           labelText: 'Email',
                           hintText: 'you@example.com',
-                          controller: _emailController,
+                          controller: authController.signUpEmailController,
                           keyboardType: TextInputType.emailAddress,
                           borderRadius: 12.r,
                           padding: EdgeInsets.zero,
@@ -164,69 +126,55 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             fontSize: 14.sp,
                             color: Colors.black,
                           ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
-                          validator: (v) {
-                            if (v == null || v.trim().isEmpty) {
-                              return 'Please enter your email';
-                            }
-                            if (!v.contains('@')) {
-                              return 'Enter a valid email';
-                            }
-                            return null;
-                          },
+                          validator: authController.validateEmail,
                         ),
                         17.sbh,
-                        CustomTextField(
-                          floatingLabelBehavior: FloatingLabelBehavior.always,
-                          labelText: 'Password',
-                          hintText: 'Create a password',
-                          controller: _passwordController,
-                          isObscureText: _obscurePassword,
-                          borderRadius: 12.r,
-                          padding: EdgeInsets.zero,
-                          borderColor: _defaultBorder,
-                          focusedBorderColor: Colors.black,
-                          enabledBorderWidth: 0.5,
-                          focusedBorderWidth: 1,
-                          errorBorderColor: _errorColor,
-                          errorBorderWidth: 1,
-                          focusedErrorBorderWidth: 1,
-                          hintColor: _hintColor,
-                          textColor: Colors.black,
-                          cursorColor: Colors.black,
-                          fillColor: Colors.transparent,
-                          focusedFillColor: Colors.transparent,
-                          fontSize: 14.sp,
-                          hintFontWeight: FontWeight.w400,
-                          labelColor: Colors.black,
-                          floatingLabelStyle: TextStyle(
-                            fontFamily: MyFonts.plusJakartaSans,
+                        Obx(
+                          () => CustomTextField(
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                            labelText: 'Password',
+                            hintText: 'Create a password',
+                            controller: authController.signUpPasswordController,
+                            isObscureText: authController.signUpObscurePassword.value,
+                            borderRadius: 12.r,
+                            padding: EdgeInsets.zero,
+                            borderColor: _defaultBorder,
+                            focusedBorderColor: Colors.black,
+                            enabledBorderWidth: 0.5,
+                            focusedBorderWidth: 1,
+                            errorBorderColor: _errorColor,
+                            errorBorderWidth: 1,
+                            focusedErrorBorderWidth: 1,
+                            hintColor: _hintColor,
+                            textColor: Colors.black,
+                            cursorColor: Colors.black,
+                            fillColor: Colors.transparent,
+                            focusedFillColor: Colors.transparent,
                             fontSize: 14.sp,
-                            color: Colors.black,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
-                          suffixIcon: IconButton(
-                            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                            icon: Icon(
-                              _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                              color: Colors.black.withOpacity(0.6),
-                              size: 20.sp,
+                            hintFontWeight: FontWeight.w400,
+                            labelColor: Colors.black,
+                            floatingLabelStyle: TextStyle(
+                              fontFamily: MyFonts.plusJakartaSans,
+                              fontSize: 14.sp,
+                              color: Colors.black,
                             ),
+                            suffixIcon: IconButton(
+                              onPressed: authController.toggleSignUpPasswordVisibility,
+                              icon: Icon(
+                                authController.signUpObscurePassword.value
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: Colors.black.withOpacity(0.6),
+                                size: 20.sp,
+                              ),
+                            ),
+                            validator: authController.validateSignUpPassword,
                           ),
-                          validator: (v) {
-                            if (v == null || v.isEmpty) {
-                              return 'Please enter a password';
-                            }
-                            if (v.length < 6) {
-                              return 'Use at least 6 characters';
-                            }
-                            return null;
-                          },
                         ),
                         20.sbh,
                         CustomButton(
                           text: 'Create account',
-                          onPressed: _onCreateAccount,
+                          onPressed: authController.onCreateAccount,
                           width: double.infinity,
                           height: 52.h,
                           borderRadius: 12.r,
@@ -313,7 +261,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                             ),
                             GestureDetector(
-                              onTap: navigateToLoginReplace,
+                              onTap: authController.navigateToLoginReplace,
                               child: Text(
                                 'Log in',
                                 style: TextStyle(
@@ -329,7 +277,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         24.sbh,
                         const AuthOrDivider(),
                         20.sbh,
-                        GoogleAuthButton(onPressed: _onGoogle),
+                        GoogleAuthButton(onPressed: authController.onGoogleAuthPressed),
                       ],
                     ),
                   ),
