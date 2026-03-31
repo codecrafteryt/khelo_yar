@@ -1,3 +1,12 @@
+/*
+  ---------------------------------------
+  Project: khelo yaar Mobile Application
+  Date: March 31, 2024
+  Author: Ameer Salman
+  ---------------------------------------
+  Description: map screen.dart
+*/
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../controller/map_controller.dart';

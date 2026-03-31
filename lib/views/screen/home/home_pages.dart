@@ -1,3 +1,12 @@
+/*
+  ---------------------------------------
+  Project: khelo yaar Mobile Application
+  Date: March 31, 2024
+  Author: Ameer Salman
+  ---------------------------------------
+  Description: Home pages
+*/
+
 import 'package:flutter/material.dart';
 import 'bottom_nav_bar.dart';
 

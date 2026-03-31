@@ -1,3 +1,13 @@
+/*
+  ---------------------------------------
+  Project: khelo yaar Mobile Application
+  Date: March 31, 2024
+  Author: Ameer Salman
+  ---------------------------------------
+  Description: re enter password screen.dart
+*/
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';

@@ -1,3 +1,12 @@
+/*
+  ---------------------------------------
+  Project: khelo yaar Mobile Application
+  Date: March 31, 2024
+  Author: Ameer Salman
+  ---------------------------------------
+  Description: chat
+*/
+
 import 'package:flutter/material.dart';
 
 class Chats extends StatelessWidget {

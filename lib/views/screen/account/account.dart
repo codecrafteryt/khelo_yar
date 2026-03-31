@@ -1,3 +1,13 @@
+/*
+  ---------------------------------------
+  Project: khelo yaar Mobile Application
+  Date: March 31, 2024
+  Author: Ameer Salman
+  ---------------------------------------
+  Description: Account/profile screen
+*/
+
+
 import 'package:flutter/material.dart';
 
 class Account extends StatelessWidget {
