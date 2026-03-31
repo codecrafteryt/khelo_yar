@@ -19,6 +19,7 @@ import '../../../widgets/custom_button.dart';
 import '../../../widgets/custom_textfield.dart';
 import '../../../widgets/custom_leading_icon.dart';
 import '../../../widgets/google_auth_button.dart';
+import '../../home/bottom_nav_bar.dart';
 import '../auth_navigation.dart';
 import '../forgot_password/forgot_password_screen.dart';
 
@@ -52,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onGoogle() {
-    // UI-only
+    Get.to(() => NavBar());
   }
 
   @override
@@ -65,12 +66,12 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           children: [
             CustomAppBar(
-              leading: CustomLeadingIcon(
-                onPressed: (){
-                 // controller.clearSignupFields();
-                  Get.back();
-                },
-              ),
+              // leading: CustomLeadingIcon(
+              //   onPressed: (){
+              //    // controller.clearSignupFields();
+              //     Get.back();
+              //   },
+              // ),
               title: Text("Login",
                 style: TextStyle(
                   fontSize: 15.sp,

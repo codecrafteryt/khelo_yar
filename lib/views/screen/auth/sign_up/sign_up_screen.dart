@@ -19,6 +19,7 @@ import '../../../widgets/custom_button.dart';
 import '../../../widgets/custom_leading_icon.dart';
 import '../../../widgets/custom_textfield.dart';
 import '../../../widgets/google_auth_button.dart';
+import '../../home/bottom_nav_bar.dart';
 import '../auth_navigation.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -53,7 +54,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _onGoogle() {
-    // UI-only
+    Get.to(() => NavBar());
   }
 
   @override
