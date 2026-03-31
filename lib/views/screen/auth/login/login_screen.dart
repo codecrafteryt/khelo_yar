@@ -13,13 +13,14 @@ import '../../../../utils/extensions/extentions.dart';
 import '../../../../utils/values/my_color.dart';
 import '../../../../utils/values/my_fonts.dart';
 import '../../../../utils/values/my_images.dart';
-import '../../../widgets/auth_labeled_field.dart';
 import '../../../widgets/auth_or_divider.dart';
 import '../../../widgets/custom_app_bar.dart';
 import '../../../widgets/custom_button.dart';
+import '../../../widgets/custom_textfield.dart';
 import '../../../widgets/custom_leading_icon.dart';
 import '../../../widgets/google_auth_button.dart';
 import '../auth_navigation.dart';
+import '../forgot_password/forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -29,9 +30,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  static const _errorColor = Color.fromRGBO(240, 66, 72, 1);
+  static const _defaultBorder = Color.fromRGBO(145, 148, 155, 1);
+  static const _hintColor = Color.fromRGBO(211, 211, 211, 1);
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -66,31 +71,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   Get.back();
                 },
               ),
-              title: Text("Login",),
+              title: Text("Login",
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: MyFonts.plusJakartaSans,
+                ),
+              ),
             ),
             Center(
               child: SingleChildScrollView(
                 padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h + bottomInset),
-                child: Container(
-                  width: double.infinity,
-                  constraints: BoxConstraints(maxWidth: 400.w),
-                  decoration: BoxDecoration(
-                    color: MyColors.white,
-                    borderRadius: BorderRadius.circular(16.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.06),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  padding: EdgeInsets.fromLTRB(20.w, 16.h, 12.w, 24.h),
-                  child: Form(
+                child: Form(
                     key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        10.sbh,
                         SizedBox(
                           height: 100,
                           width: 100,
@@ -101,12 +98,35 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         12.sbh,
-                        AuthLabeledField(
-                          label: 'Email',
-                          hint: 'you@example.com',
+                        CustomTextField(
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                          labelText: 'Email',
+                          hintText: 'you@example.com',
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
-                          prefixIcon: Icons.mail_outline_rounded,
+                          borderRadius: 12.r,
+                          padding: EdgeInsets.zero,
+                          borderColor: _defaultBorder,
+                          focusedBorderColor: Colors.black,
+                          enabledBorderWidth: 0.5,
+                          focusedBorderWidth: 1,
+                          errorBorderColor: _errorColor,
+                          errorBorderWidth: 1,
+                          focusedErrorBorderWidth: 1,
+                          hintColor: _hintColor,
+                          textColor: Colors.black,
+                          cursorColor: Colors.black,
+                          fillColor: Colors.transparent,
+                          focusedFillColor: Colors.transparent,
+                          fontSize: 14.sp,
+                          hintFontWeight: FontWeight.w400,
+                          labelColor: Colors.black,
+                          floatingLabelStyle: TextStyle(
+                            fontFamily: MyFonts.plusJakartaSans,
+                            fontSize: 14.sp,
+                            color: Colors.black,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
                           validator: (v) {
                             if (v == null || v.trim().isEmpty) {
                               return 'Please enter your email';
@@ -118,12 +138,43 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                         ),
                         18.sbh,
-                        AuthLabeledField(
-                          label: 'Password',
-                          hint: 'Password',
+                        CustomTextField(
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                          labelText: 'Password',
+                          hintText: 'Password',
                           controller: _passwordController,
-                          isPassword: true,
-                          prefixIcon: Icons.lock_outline_rounded,
+                          isObscureText: _obscurePassword,
+                          borderRadius: 12.r,
+                          padding: EdgeInsets.zero,
+                          borderColor: _defaultBorder,
+                          focusedBorderColor: Colors.black,
+                          enabledBorderWidth: 0.5,
+                          focusedBorderWidth: 1,
+                          errorBorderColor: _errorColor,
+                          errorBorderWidth: 1,
+                          focusedErrorBorderWidth: 1,
+                          hintColor: _hintColor,
+                          textColor: Colors.black,
+                          cursorColor: Colors.black,
+                          fillColor: Colors.transparent,
+                          focusedFillColor: Colors.transparent,
+                          fontSize: 14.sp,
+                          hintFontWeight: FontWeight.w400,
+                          labelColor: Colors.black,
+                          floatingLabelStyle: TextStyle(
+                            fontFamily: MyFonts.plusJakartaSans,
+                            fontSize: 14.sp,
+                            color: Colors.black,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
+                          suffixIcon: IconButton(
+                            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                            icon: Icon(
+                              _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                              color: Colors.black.withOpacity(0.6),
+                              size: 20.sp,
+                            ),
+                          ),
                           validator: (v) {
                             if (v == null || v.isEmpty) {
                               return 'Please enter your password';
@@ -131,17 +182,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                         ),
-                        8.sbh,
+
                         Align(
-                          alignment: Alignment.centerRight,
+                          alignment: Alignment.centerLeft,
                           child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Get.to(() => ForgotPasswordScreen(),);
+                            },
                             style: TextButton.styleFrom(
                               foregroundColor: MyColors.brandPrimary,
-                              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                              padding: EdgeInsets.symmetric(horizontal: 8.w),
                               textStyle: TextStyle(
                                 fontFamily: MyFonts.plusJakartaSans,
-                                fontSize: 14.sp,
+                                fontSize: 12.sp,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -153,7 +206,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           text: 'Continue',
                           onPressed: _onContinue,
                           width: double.infinity,
-                          height: 52.h,
                           borderRadius: 12.r,
                           backgroundColor: MyColors.brandPrimary,
                           borderColor: MyColors.brandPrimary,
@@ -169,7 +221,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               'New to KheloYaar? ',
                               style: TextStyle(
                                 fontFamily: MyFonts.plusJakartaSans,
-                                fontSize: 14.sp,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400,
                                 color: MyColors.textSecondary,
                               ),
                             ),
@@ -194,7 +247,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
-                ),
               ),
             ),
           ],

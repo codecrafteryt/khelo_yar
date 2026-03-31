@@ -54,7 +54,7 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: height ?? 60.h,
+      height: height ?? 50,
       width: width ?? 352.w,
       child: TextButton(
         onPressed: isLoading ? null : onPressed, // Disable button when loading

@@ -13,8 +13,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CustomTextField extends StatelessWidget {
+  final String? labelText;
   final String hintText;
   final double? fontSize;
+  final FontWeight hintFontWeight;
   final TextEditingController controller;
   final bool isObscureText;
   final double borderRadius;
@@ -41,6 +43,14 @@ class CustomTextField extends StatelessWidget {
   final ValueChanged<String>? onFieldSubmitted;
   final bool readOnly;
   final VoidCallback? onTap;
+  final FloatingLabelBehavior? floatingLabelBehavior;
+  final Color? labelColor;
+  final TextStyle? floatingLabelStyle;
+  final double enabledBorderWidth;
+  final double focusedBorderWidth;
+  final Color? errorBorderColor;
+  final double errorBorderWidth;
+  final double focusedErrorBorderWidth;
   // parameters for limitations
   final int? maxLength;
   final String? allowedPattern;
@@ -49,8 +59,10 @@ class CustomTextField extends StatelessWidget {
 
   const CustomTextField({
     super.key,
+    this.labelText,
     required this.hintText,
     required this.controller,
+    this.hintFontWeight = FontWeight.w400,
     this.isObscureText = false,
     this.borderRadius = 10.0,
     this.padding = const EdgeInsets.all(5),
@@ -81,13 +93,21 @@ class CustomTextField extends StatelessWidget {
     this.allowedPattern,
     this.preventSpaces = false,
     this.onChanged,
+    this.floatingLabelBehavior,
+    this.labelColor,
+    this.floatingLabelStyle,
+    this.enabledBorderWidth = 2,
+    this.focusedBorderWidth = 1,
+    this.errorBorderColor,
+    this.errorBorderWidth = 1,
+    this.focusedErrorBorderWidth = 1,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: width,
-      height: height,
+      height: height ?? 50,
       child: Padding(
         padding: padding,
         child: TextFormField(
@@ -115,16 +135,38 @@ class CustomTextField extends StatelessWidget {
             counterText: "", // Hides the character counter
             filled: true,
             fillColor: fillColor,
+            labelText: labelText,
+            floatingLabelBehavior: floatingLabelBehavior,
             hintText: hintText,
             contentPadding: contentPadding,
-            hintStyle: TextStyle(color: hintColor, fontSize: fontSize),
+            hintStyle: TextStyle(
+              color: hintColor,
+              fontSize: fontSize,
+              fontWeight: hintFontWeight,
+            ),
+            labelStyle: TextStyle(color: labelColor ?? hintColor, fontSize: fontSize),
+            floatingLabelStyle: floatingLabelStyle,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(borderRadius),
-              borderSide: BorderSide(color: borderColor, width: 2.w),
+              borderSide: BorderSide(color: borderColor, width: enabledBorderWidth),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(borderRadius),
-              borderSide: BorderSide(color: focusedBorderColor, width: 1),
+              borderSide: BorderSide(color: focusedBorderColor, width: focusedBorderWidth),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(borderRadius),
+              borderSide: BorderSide(
+                color: errorBorderColor ?? const Color.fromRGBO(240, 66, 72, 1),
+                width: errorBorderWidth,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(borderRadius),
+              borderSide: BorderSide(
+                color: errorBorderColor ?? const Color.fromRGBO(240, 66, 72, 1),
+                width: focusedErrorBorderWidth,
+              ),
             ),
             suffixIcon: showCustomSendIcon
                 ? Container(
