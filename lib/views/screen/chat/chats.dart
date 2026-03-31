@@ -9,17 +9,19 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/coming_soon_placeholder.dart';
+
 class Chats extends StatelessWidget {
   const Chats({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Text("Chats"),
-        ],
+    return const Scaffold(
+      body: ComingSoonPlaceholder(
+        title: 'Messages',
+        icon: Icons.chat_bubble_outline_rounded,
+        message:
+            'Chat with hosts and stay on top of your bookings — launching soon.',
       ),
     );
   }
