@@ -9,6 +9,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import 'package:khelo_yar/views/screen/bookings/booking.dart';
+import 'package:khelo_yar/views/screen/chat/chats.dart';
 import '../../../utils/values/my_color.dart';
 import '../account/account.dart';
 import '../wishlist/wishlist.dart';
@@ -25,6 +27,8 @@ class _NavBarState extends State<NavBar> {
   final List<Widget> _children = [
     const HomeExploreScreen(),
     Wishlist(),
+    Booking(),
+    Chats(),
     Account(),
   ];
 
@@ -99,6 +103,8 @@ class _NavBarState extends State<NavBar> {
               items: [
                 BottomNavigationBarItem(icon: const Icon(Icons.explore_outlined, size: 20.0,), label: 'Explore'.tr),
                 BottomNavigationBarItem(icon: const Icon(Icons.favorite_border, size: 20.0,), label: 'Wishlist'.tr),
+                BottomNavigationBarItem(icon: const Icon(Icons.calendar_month_sharp, size: 20.0,), label: 'Booking'.tr),
+                BottomNavigationBarItem(icon: const Icon(Icons.chat_outlined, size: 20.0,), label: 'Inbox'.tr),
                 BottomNavigationBarItem(icon: const Icon(Icons.account_circle_outlined, size: 20.0,), label: 'Account'.tr),
               ],
             ),
