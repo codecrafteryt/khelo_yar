@@ -83,7 +83,7 @@ class Constants {
   static const String lookUpListing = 'listing/lookup';
 
   // End points for Search Module
-  static const String searches = 'listing/search';
+  static const String searches = 'listing/search_svgs';
   static const String deleteSearches = 'listing/delete/searches';
   static const String recentSearches = 'listing/recent/searches';
 
