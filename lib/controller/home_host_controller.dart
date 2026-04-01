@@ -8,8 +8,6 @@
 */
 
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -199,44 +197,16 @@ class HomeHostController extends GetxController {
   /// Map + Filters pill — show when sheet is not fully collapsed (original behavior).
   bool get showFloatingActions => sheetExtent > listingMinSize + 0.02;
 
-  void _debugLog(String hypothesisId, String message, Map<String, dynamic> data) {
-    final payload = <String, dynamic>{
-      'sessionId': 'a4c2a6',
-      'runId': 'post-fix',
-      'hypothesisId': hypothesisId,
-      'location': 'home_host_controller.dart',
-      'message': message,
-      'data': data,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-    };
-    File('/Users/chsalman/Desktop/khelo_yar/.cursor/debug-a4c2a6.log')
-        .writeAsStringSync('${jsonEncode(payload)}\n', mode: FileMode.append);
-  }
-
   @override
   void onInit() {
     super.onInit();
     sheetExtentNotifier = ValueNotifier<double>(listingInitialSize);
     mapController = Get.find<MapController>();
-    // #region agent log
-    _debugLog('H4', 'HomeHostController.onInit', {
-      'controllerHash': identityHashCode(this),
-      'sheetControllerHash': identityHashCode(sheetController),
-      'sheetControllerAttached': sheetController.isAttached,
-    });
-    // #endregion
     mapController.initialize(_allVenues, onVenueFocused);
   }
 
   @override
   void onClose() {
-    // #region agent log
-    _debugLog('H4', 'HomeHostController.onClose', {
-      'controllerHash': identityHashCode(this),
-      'sheetControllerHash': identityHashCode(sheetController),
-      'sheetControllerAttached': sheetController.isAttached,
-    });
-    // #endregion
     _listingScrollController?.removeListener(_onListingScroll);
     sheetExtentNotifier.dispose();
     sheetController.dispose();
@@ -254,13 +224,6 @@ class HomeHostController extends GetxController {
   /// When Explore tab is shown again, expand sheet toward max (short curve).
   void resetSheetExpandedOnExploreVisible() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // #region agent log
-      _debugLog('H3', 'resetSheetExpandedOnExploreVisible callback', {
-        'controllerHash': identityHashCode(this),
-        'sheetControllerHash': identityHashCode(sheetController),
-        'sheetControllerAttached': sheetController.isAttached,
-      });
-      // #endregion
       if (!sheetController.isAttached) return;
       unawaited(
         sheetController.animateTo(
@@ -338,14 +301,6 @@ class HomeHostController extends GetxController {
     sheetExtent = clamped;
     sheetExtentNotifier.value = clamped;
     final t = normalizedSheetProgress(clamped);
-    // #region agent log
-    _debugLog('H7', 'onSheetExtentChanged_noGetBuilderUpdate', {
-      'controllerHash': identityHashCode(this),
-      'sheetControllerHash': identityHashCode(sheetController),
-      'sheetControllerAttached': sheetController.isAttached,
-      'extent': clamped,
-    });
-    // #endregion
 
     final bottomInset = clamped * screenSize.height;
     mapController.applySheetCoordination(

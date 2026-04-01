@@ -7,9 +7,6 @@
   Description: Explore — map + draggable sheet + coordinated header / FABs.
 */
 
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -37,79 +34,20 @@ class HomeExploreScreen extends StatefulWidget {
 }
 
 class _HomeExploreScreenState extends State<HomeExploreScreen> {
-  int _buildCount = 0;
-
-  void _debugLog(String hypothesisId, String message, Map<String, dynamic> data) {
-    final payload = <String, dynamic>{
-      'sessionId': 'a4c2a6',
-      'runId': 'post-fix',
-      'hypothesisId': hypothesisId,
-      'location': 'home_explore_screen.dart',
-      'message': message,
-      'data': data,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-    };
-    File('/Users/chsalman/Desktop/khelo_yar/.cursor/debug-a4c2a6.log')
-        .writeAsStringSync('${jsonEncode(payload)}\n', mode: FileMode.append);
-  }
-
   @override
   void initState() {
     super.initState();
     final c = Get.find<HomeHostController>();
-    // #region agent log
-    _debugLog('H1', 'HomeExploreScreen.initState', {
-      'stateHash': identityHashCode(this),
-      'widgetHash': identityHashCode(widget),
-      'controllerHash': identityHashCode(c),
-      'sheetControllerHash': identityHashCode(c.sheetController),
-      'sheetControllerAttached': c.sheetController.isAttached,
-    });
-    // #endregion
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      // #region agent log
-      _debugLog('H3', 'HomeExploreScreen.postFrame before ensure/reset', {
-        'stateHash': identityHashCode(this),
-        'controllerHash': identityHashCode(c),
-        'sheetControllerAttached': c.sheetController.isAttached,
-      });
-      // #endregion
       c.ensureInitialCoordination(context);
       c.resetSheetExpandedOnExploreVisible();
     });
   }
 
   @override
-  void dispose() {
-    final c = Get.find<HomeHostController>();
-    // #region agent log
-    _debugLog('H1', 'HomeExploreScreen.dispose', {
-      'stateHash': identityHashCode(this),
-      'widgetHash': identityHashCode(widget),
-      'controllerHash': identityHashCode(c),
-      'sheetControllerHash': identityHashCode(c.sheetController),
-      'sheetControllerAttached': c.sheetController.isAttached,
-    });
-    // #endregion
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final c = Get.find<HomeHostController>();
-    _buildCount++;
-    // #region agent log
-    _debugLog('H2', 'HomeExploreScreen.build', {
-      'stateHash': identityHashCode(this),
-      'buildCount': _buildCount,
-      'controllerHash': identityHashCode(c),
-      'sheetControllerHash': identityHashCode(c.sheetController),
-      'sheetControllerAttached': c.sheetController.isAttached,
-      'searchSheetOpen': c.searchSheetOpen,
-      'mounted': mounted,
-    });
-    // #endregion
 
     final topPad = MediaQuery.paddingOf(context).top;
     final bottomPad = MediaQuery.paddingOf(context).bottom;

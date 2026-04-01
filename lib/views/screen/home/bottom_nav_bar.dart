@@ -9,8 +9,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:khelo_yar/controller/home_host_controller.dart';
-import 'dart:convert';
-import 'dart:io';
 import 'package:khelo_yar/views/screen/bookings/booking.dart';
 import 'package:khelo_yar/views/screen/chat/chats.dart';
 import '../../../utils/values/my_color.dart';
@@ -36,28 +34,7 @@ class _NavBarState extends State<NavBar> {
 
   int _selectedIndex = 0;
 
-  void _debugLog(String hypothesisId, String message, Map<String, dynamic> data) {
-    final payload = <String, dynamic>{
-      'sessionId': 'a4c2a6',
-      'runId': 'post-fix',
-      'hypothesisId': hypothesisId,
-      'location': 'bottom_nav_bar.dart',
-      'message': message,
-      'data': data,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-    };
-    File('/Users/chsalman/Desktop/khelo_yar/.cursor/debug-a4c2a6.log')
-        .writeAsStringSync('${jsonEncode(payload)}\n', mode: FileMode.append);
-  }
-
   void _onItemTapped(int index) {
-    // #region agent log
-    _debugLog('H6', 'NavBar.onItemTapped before setState', {
-      'stateHash': identityHashCode(this),
-      'fromIndex': _selectedIndex,
-      'toIndex': index,
-    });
-    // #endregion
     setState(() {
       _selectedIndex = index;
     });
@@ -65,13 +42,6 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
-    // #region agent log
-    _debugLog('H1', 'NavBar.build', {
-      'stateHash': identityHashCode(this),
-      'selectedIndex': _selectedIndex,
-      'childrenLen': _children.length,
-    });
-    // #endregion
     final hc = Get.find<HomeHostController>();
     return Scaffold(
       body: IndexedStack(
