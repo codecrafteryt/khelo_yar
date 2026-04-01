@@ -1,16 +1,71 @@
-  /*
-    ---------------------------------------
-    Project: khelo yaar Mobile Application
-    Date: April 2, 2024
-    Author: Ameer Salman
-    ---------------------------------------
-    Description: Listing detail controller
-  */
+/*
+  Listing detail — carousel index, favorites, mock reviews metadata.
+  Navigation to gallery / fullscreen / sheets is performed by listing UI widgets.
+*/
 
-  import 'package:get/get_state_manager/src/simple/get_controllers.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-  class ListingDetailController extends GetxController {
-    final SharedPreferences sharedPreferences;
-    ListingDetailController({required this.sharedPreferences,});
+import '../data/models/explore_venue.dart';
+import '../data/models/listing_review.dart';
+
+class ListingDetailController extends GetxController {
+  ListingDetailController({required this.venue});
+
+  final ExploreVenue venue;
+
+  late final PageController carouselPageController;
+  final RxInt carouselIndex = 0.obs;
+  final RxBool isFavorite = false.obs;
+
+  List<String> get photoUrls => venue.orderedPhotoUrls;
+
+  /// Star row percentages (5 → 1), for reviews UI.
+  late final Map<int, double> starDistributionPercent;
+
+  late final List<ListingReview> reviews;
+
+  @override
+  void onInit() {
+    super.onInit();
+    carouselPageController = PageController();
+    starDistributionPercent = {5: 7, 4: 4, 3: 0, 2: 0, 1: 0};
+    reviews = _defaultReviews();
   }
+
+  @override
+  void onClose() {
+    carouselPageController.dispose();
+    super.onClose();
+  }
+
+  void onCarouselPageChanged(int index) {
+    carouselIndex.value = index;
+  }
+
+  void toggleFavorite() => isFavorite.toggle();
+
+  List<ListingReview> _defaultReviews() {
+    return const [
+      ListingReview(
+        authorName: 'Anonymous Player',
+        dateLabel: 'March 2026',
+        rating: 5,
+        body:
+            'Excellent lighting for evening sessions. Came with 10 friends and we all had a blast.',
+      ),
+      ListingReview(
+        authorName: 'Sara K.',
+        dateLabel: 'February 2026',
+        rating: 4.5,
+        body: 'Courts were spotless. Booking process was smooth.',
+      ),
+      ListingReview(
+        authorName: 'Hassan M.',
+        dateLabel: 'January 2026',
+        rating: 5,
+        body: 'Coaches were professional — great for beginners.',
+      ),
+    ];
+  }
+}

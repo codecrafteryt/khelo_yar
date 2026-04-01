@@ -16,6 +16,18 @@ class ExploreVenue {
   final double lng;
   final String imageUrl;
 
+  /// Extra listing photos (cover is always [imageUrl] first in [orderedPhotoUrls]).
+  final List<String>? galleryUrls;
+
+  final String? aboutArena;
+  final List<String>? amenities;
+  final String? groundRules;
+  /// Single-line address for detail UI (e.g. "Block P, Johar Town, Lahore").
+  final String? addressLine;
+
+  /// Optional capacity chip (e.g. "Up to 4 players").
+  final String? capacityLabel;
+
   const ExploreVenue({
     required this.id,
     required this.name,
@@ -28,5 +40,27 @@ class ExploreVenue {
     required this.lat,
     required this.lng,
     required this.imageUrl,
+    this.galleryUrls,
+    this.aboutArena,
+    this.amenities,
+    this.groundRules,
+    this.addressLine,
+    this.capacityLabel,
   });
+
+  /// Cover first, then gallery URLs; skips empties and duplicates.
+  List<String> get orderedPhotoUrls {
+    final out = <String>[];
+    final cover = imageUrl.trim();
+    if (cover.isNotEmpty) out.add(cover);
+    if (galleryUrls != null) {
+      for (final u in galleryUrls!) {
+        final t = u.trim();
+        if (t.isNotEmpty && !out.contains(t)) out.add(t);
+      }
+    }
+    return out;
+  }
+
+  String get locationSubtitle => '$area, $city';
 }

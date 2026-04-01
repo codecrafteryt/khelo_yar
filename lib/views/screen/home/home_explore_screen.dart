@@ -12,6 +12,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../controller/home_host_controller.dart';
+import '../../../controller/listing_detail_controller.dart';
 import '../../../controller/map_controller.dart';
 import '../../../data/sport_picker_catalog.dart';
 import '../../../data/stay_date_formatters.dart';
@@ -22,6 +23,7 @@ import '../../widgets/date_picker/stay_date_picker_sheet.dart';
 import '../../widgets/sport_picker/sport_picker_sheet.dart';
 import '../../widgets/location_picker/location_picker_dialog.dart';
 import '../../widgets/explore_venue_sheet_tile.dart';
+import '../listing/listing_detail_screen.dart';
 import '../map/map.dart';
 import '../search/home_search_bar.dart';
 import '../services_tab_button/service_tab_button.dart';
@@ -165,7 +167,15 @@ class _HomeExploreScreenState extends State<HomeExploreScreen> {
                                         final v = venues[index ~/ 2];
                                         return ExploreVenueSheetTile(
                                           venue: v,
-                                          onTap: () => c.onVenueFocused(v),
+                                          onTap: () {
+                                            c.onVenueFocused(v);
+                                            Get.to(
+                                              () => const ListingDetailScreen(),
+                                              binding: BindingsBuilder(() {
+                                                Get.put(ListingDetailController(venue: v));
+                                              }),
+                                            );
+                                          },
                                         );
                                       },
                                       childCount: venues.length * 2 - 1,
