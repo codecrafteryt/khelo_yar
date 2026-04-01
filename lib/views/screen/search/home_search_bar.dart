@@ -54,6 +54,8 @@ class HomeSearchBar extends StatelessWidget {
                   children: [
                     Text(
                       locationTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: kSize13DarkW300Text.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
