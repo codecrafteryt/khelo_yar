@@ -89,50 +89,50 @@ class ExploreVenueSheetTile extends StatelessWidget {
                               child: Icon(Icons.favorite_border_rounded, color: MyColors.white, size: 16.sp),
                             ),
                           ),
-                          if (isInstant)
-                            Positioned(
-                              top: 12.h,
-                              left: 10.w,
-                              child: _Badge(
-                                label: 'Instant Book',
-                                icon: Icons.bolt_rounded,
-                                color: const Color(0xFFE53EAE),
-                              ),
-                            ),
-                          if (hasTopHost)
-                            Positioned(
-                              bottom: 12.h,
-                              left: 10.w,
-                              child: _Badge(
-                                label: 'Top Host',
-                                icon: Icons.verified_rounded,
-                                color: MyColors.white,
-                                textColor: MyColors.blackDark,
-                              ),
-                            ),
-                          if (hasDeal)
-                            Positioned(
-                              bottom: 12.h,
-                              right: 12.w,
-                              child: Container(
-                                width: 56.w,
-                                height: 56.w,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: const Color(0xFF5B63F6),
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'DEAL',
-                                  style: TextStyle(
-                                    fontFamily: MyFonts.plusJakartaSans,
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w700,
-                                    color: MyColors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
+                          // if (isInstant)
+                          //   Positioned(
+                          //     top: 12.h,
+                          //     left: 10.w,
+                          //     child: _Badge(
+                          //       label: 'Instant Book',
+                          //       icon: Icons.bolt_rounded,
+                          //       color: const Color(0xFFE53EAE),
+                          //     ),
+                          //   ),
+                          // if (hasTopHost)
+                          //   Positioned(
+                          //     bottom: 12.h,
+                          //     left: 10.w,
+                          //     child: _Badge(
+                          //       label: 'Top Host',
+                          //       icon: Icons.verified_rounded,
+                          //       color: MyColors.white,
+                          //       textColor: MyColors.blackDark,
+                          //     ),
+                          //   ),
+                          // if (hasDeal)
+                          //   Positioned(
+                          //     bottom: 12.h,
+                          //     right: 12.w,
+                          //     child: Container(
+                          //       width: 56.w,
+                          //       height: 56.w,
+                          //       decoration: BoxDecoration(
+                          //         shape: BoxShape.circle,
+                          //         color: const Color(0xFF5B63F6),
+                          //       ),
+                          //       alignment: Alignment.center,
+                          //       child: Text(
+                          //         'DEAL',
+                          //         style: TextStyle(
+                          //           fontFamily: MyFonts.plusJakartaSans,
+                          //           fontSize: 14.sp,
+                          //           fontWeight: FontWeight.w700,
+                          //           color: MyColors.white,
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ),
                         ],
                       ),
                     ),
@@ -147,42 +147,32 @@ class ExploreVenueSheetTile extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontFamily: MyFonts.plusJakartaSans,
-                              fontSize: 27.sp / 1.5,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w600,
                               color: MyColors.blackDark,
-                            ),
-                          ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            '${venue.area} · Up to 12 guests · Sleeps 8',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontFamily: MyFonts.plusJakartaSans,
-                              fontSize: 12.5.sp,
-                              color: MyColors.textSecondary,
                             ),
                           ),
                           SizedBox(height: 5.h),
                           Row(
                             children: [
-                              Icon(Icons.star_rounded, size: 15.sp, color: const Color(0xFF5B63F6)),
-                              SizedBox(width: 3.w),
+
                               Text(
                                 '${venue.rating}',
                                 style: TextStyle(
                                   fontFamily: MyFonts.plusJakartaSans,
-                                  fontSize: 13.sp,
+                                  fontSize: 10.sp,
                                   fontWeight: FontWeight.w600,
                                   color: MyColors.blackDark,
                                 ),
                               ),
-                              SizedBox(width: 6.w),
+                              SizedBox(width: 3.w),
+                              Icon(Icons.star_rounded, size: 15.sp, color: const Color(0xFF5B63F6)),
+                              SizedBox(width: 2.w),
                               Text(
-                                '${venue.reviews} reviews',
+                                '• ${venue.reviews} reviews',
                                 style: TextStyle(
                                   fontFamily: MyFonts.plusJakartaSans,
-                                  fontSize: 12.5.sp,
+                                  fontSize: 10.sp,
                                   color: MyColors.textSecondary,
                                 ),
                               ),
@@ -191,7 +181,7 @@ class ExploreVenueSheetTile extends StatelessWidget {
                                 '\$${venue.pricePkr.toString()}+',
                                 style: TextStyle(
                                   fontFamily: MyFonts.plusJakartaSans,
-                                  fontSize: 18.sp,
+                                  fontSize: 15.sp,
                                   fontWeight: FontWeight.w700,
                                   color: MyColors.blackDark,
                                 ),
@@ -219,7 +209,7 @@ class ExploreVenueSheetTile extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontFamily: MyFonts.plusJakartaSans,
-                                    fontSize: 12.5.sp,
+                                    fontSize: 11.sp,
                                     color: MyColors.blackDark,
                                   ),
                                 ),
