@@ -31,9 +31,6 @@ const Color _kSportTileBorderIdle = MyColors.borderSubtle;
 /// Selected tile — light teal wash (on white).
 const Color _kSportSelectedFill = Color(0xFFE8F4F5);
 
-/// Section title (muted grey).
-const Color _kSportSheetTitle = Color(0xFFB0B8C4);
-
 Future<void> showSportPickerSheet(BuildContext context) async {
   await showModalBottomSheet<void>(
     context: context,
@@ -101,6 +98,9 @@ class _SportPickerSheetBody extends StatelessWidget {
                             item: item,
                             selected: isSelected,
                             onTap: () {
+                              debugPrint(
+                                'Sport sheet: name="${item.label}", service_id=${item.serviceId}',
+                              );
                               Get.find<HomeHostController>().onSportFilterSelected(item.filterValue);
                               Navigator.of(context).pop();
                             },
