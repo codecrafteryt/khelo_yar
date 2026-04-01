@@ -9,6 +9,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import '../../utils/values/my_fonts.dart';
 
 class CustomButton extends StatelessWidget {
@@ -29,6 +30,7 @@ class CustomButton extends StatelessWidget {
   final double? iconSize;
   final FontWeight? fontWeight;
   final bool isLoading; // Added this parameter
+  final String? svgIconPath;
 
   const CustomButton({
     Key? key,
@@ -49,6 +51,7 @@ class CustomButton extends StatelessWidget {
     this.iconColor,
     this.iconSize,
     this.isLoading = false, // Set default to false
+    this.svgIconPath,
   }) : super(key: key);
 
   @override
@@ -79,24 +82,44 @@ class CustomButton extends StatelessWidget {
               : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+
+              /// ✅ SVG PREFIX ICON
+              if (svgIconPath != null)
+                Padding(
+                  padding: EdgeInsets.only(right: 8.r),
+                  child: SvgPicture.asset(
+                    svgIconPath!,
+                    height: iconSize ?? 22.h,
+                    width: iconSize ?? 22.w,
+                    colorFilter: iconColor != null
+                        ? ColorFilter.mode(iconColor!, BlendMode.srcIn)
+                        : null,
+                  ),
+                ),
+
+              /// IMAGE PREFIX
               if (imagePath != null)
                 Padding(
-                  padding: EdgeInsets.only(right: 8.0.r),
+                  padding: EdgeInsets.only(right: 8.r),
                   child: Image.asset(
                     imagePath!,
                     height: 24.h,
                     width: 24.w,
                   ),
                 ),
+
+              /// MATERIAL ICON PREFIX
               if (icon != null)
                 Padding(
-                  padding: EdgeInsets.only(right: 8.0.r),
+                  padding: EdgeInsets.only(right: 8.r),
                   child: Icon(
                     icon,
                     color: iconColor ?? textColor,
                     size: iconSize ?? 24.h,
                   ),
                 ),
+
+              /// TEXT
               Text(
                 text,
                 style: TextStyle(
@@ -106,9 +129,11 @@ class CustomButton extends StatelessWidget {
                   fontFamily: MyFonts.plusJakartaSans,
                 ),
               ),
+
+              /// SUFFIX ICON
               if (suffixIcon != null)
                 Padding(
-                  padding: EdgeInsets.only(left: 8.0.r),
+                  padding: EdgeInsets.only(left: 8.r),
                   child: Icon(
                     suffixIcon,
                     color: iconColor ?? textColor,
