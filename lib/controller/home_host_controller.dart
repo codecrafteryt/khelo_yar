@@ -1,17 +1,24 @@
 /*
   ---------------------------------------
   Project: khelo yaar Mobile Application
-  Date: March 31, 2024
+  Date: March 31, 2026
   Author: Ameer Salman
   ---------------------------------------
   Description: Home host controller — sheet ↔ map ↔ header coordination
 */
+
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/models/explore_venue.dart';
+import '../data/models/location_picker_result.dart';
+import '../data/models/stay_date_selection.dart';
+import '../data/stay_date_formatters.dart';
 import 'map_controller.dart';
 
 /// Mock venues (Pakistan) — replace with API later.
@@ -91,8 +98,10 @@ class HomeHostController extends GetxController {
   final DraggableScrollableController sheetController = DraggableScrollableController();
 
   static const double listingMinSize = 0.04;
-  static const double listingInitialSize = 0.81;
-  static const double listingMaxSize = 0.94;
+  static const double listingMaxSize = 0.81;
+
+  /// Starts near half-screen; [snapSizes] pulls drag release to ~50%.
+  static const double listingInitialSize = 0.5;
 
   /// Visual height of edge header block (search + chips) for map padding — logical pixels.
   static const double headerBlockHeight = 118;
@@ -100,33 +109,136 @@ class HomeHostController extends GetxController {
   /// Pixels header slides up when sheet is collapsed (t → 0).
   static const double headerHideTranslate = 112;
 
+  // --- Thresholds (documented magic numbers) ---
+  /// Bottom nav hidden when sheet is almost fully collapsed (map-first).
+  static const double extentShowBottomNav = 0.15;
+  /// Below this, map should receive pan/zoom; above, sheet/list owns vertical interaction.
+  static const double extentMapTouchCutoff = 0.55;
+  /// Map-first: search hidden when sheet is very collapsed.
+  static const double extentTopBarOpacityStart = 0.30;
+  /// After this, search is fully visible unless we’re in the “half sheet” band below.
+  static const double extentTopBarOpacityEnd = 0.45;
+  /// Half-sheet band (around [listingInitialSize]): search fully hidden.
+  static const double extentSearchHiddenHalfHalfWidth = 0.12;
+  /// Load more when list scroll is within this distance of the end (px).
+  static const double listingLoadMoreLeadPx = 200;
+
   double sheetExtent = listingInitialSize;
 
-  /// Single driver for UI: 0 = sheet collapsed, 1 = sheet expanded. Drives header + map (via [onSheetExtentChanged]).
-  late final ValueNotifier<double> sheetProgressNotifier;
+  /// Drives overlay/header/FAB/nav without calling [update] on every drag (avoids rebuilding [DraggableScrollableSheet]).
+  late final ValueNotifier<double> sheetExtentNotifier;
 
   bool _layoutCoordinationDone = false;
 
   bool searchSheetOpen = false;
 
-  List<ExploreVenue> get filteredVenues => mapController.filteredVenues(kExploreMockVenues);
+  /// Picked "Where" label for search bar + map focus.
+  String? searchLocationLabel;
+
+  double? searchLat;
+  double? searchLng;
+  bool searchFromCurrentLocation = false;
+
+  /// Committed stay dates (applied when user confirms **Search** on explore sheet).
+  StayDateSelection committedStayDates = const StayDateSelection();
+
+  /// Working copy while explore / date sheet are open.
+  StayDateSelection sessionStayDates = const StayDateSelection();
+
+  StayDateSelection? _stayDatePickerSnapshot;
+
+  /// Calendar bounds: today (local) through end of next calendar year.
+  (DateTime, DateTime) get stayCalendarBounds {
+    final now = DateTime.now();
+    final min = DateTime(now.year, now.month, now.day);
+    final max = DateTime(now.year + 1, 12, 31);
+    return (min, max);
+  }
+
+  /// Second line under location (reflects [committedStayDates]).
+  String searchDateSubtitle = StayDateFormatters.committedSubtitle(const StayDateSelection());
+
+  /// Venue list (grows with mock pagination).
+  final List<ExploreVenue> _allVenues = List<ExploreVenue>.from(kExploreMockVenues);
+  int _paginationGeneration = 0;
+  bool _loadingMore = false;
+
+  ScrollController? _listingScrollController;
+
+  List<ExploreVenue> get filteredVenues => mapController.filteredVenues(_allVenues);
 
   double normalizedSheetProgress(double extent) {
     final e = extent.clamp(listingMinSize, listingMaxSize);
     return ((e - listingMinSize) / (listingMaxSize - listingMinSize)).clamp(0.0, 1.0);
   }
 
+  /// Bottom bar: extent < 0.15 → hide; extent >= 0.15 → show (see [extentShowBottomNav]).
+  bool get showBottomNav => sheetExtent >= extentShowBottomNav;
+
+  /// Sheet is "down" / map-first when extent is low — map receives gestures.
+  bool get sheetIsDown => sheetExtent <= extentMapTouchCutoff;
+
+  /// When sheet is "up", block map taps in the visible map strip (handled in UI overlay).
+  bool get sheetBlocksMapTouches => sheetExtent > extentMapTouchCutoff;
+
+  /// Search / chips row: hidden when sheet is very low, **fully hidden when sheet ~half** (user request),
+  /// otherwise visible (with a short fade right above the collapsed zone).
+  double get topSearchBarOpacity {
+    final e = sheetExtent.clamp(0.0, 1.0);
+    if (e <= extentTopBarOpacityStart) return 0;
+    // Listing sheet ~50% height (snap default): hide search completely.
+    if ((e - listingInitialSize).abs() <= extentSearchHiddenHalfHalfWidth) {
+      return 0;
+    }
+    if (e >= extentTopBarOpacityEnd) return 1;
+    final t = (e - extentTopBarOpacityStart) /
+        (extentTopBarOpacityEnd - extentTopBarOpacityStart);
+    return t.clamp(0.0, 1.0);
+  }
+
+  /// Map + Filters pill — show when sheet is not fully collapsed (original behavior).
+  bool get showFloatingActions => sheetExtent > listingMinSize + 0.02;
+
+  void _debugLog(String hypothesisId, String message, Map<String, dynamic> data) {
+    final payload = <String, dynamic>{
+      'sessionId': 'a4c2a6',
+      'runId': 'post-fix',
+      'hypothesisId': hypothesisId,
+      'location': 'home_host_controller.dart',
+      'message': message,
+      'data': data,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    };
+    File('/Users/chsalman/Desktop/khelo_yar/.cursor/debug-a4c2a6.log')
+        .writeAsStringSync('${jsonEncode(payload)}\n', mode: FileMode.append);
+  }
+
   @override
   void onInit() {
     super.onInit();
+    sheetExtentNotifier = ValueNotifier<double>(listingInitialSize);
     mapController = Get.find<MapController>();
-    mapController.initialize(kExploreMockVenues, onVenueFocused);
-    sheetProgressNotifier = ValueNotifier<double>(normalizedSheetProgress(listingInitialSize));
+    // #region agent log
+    _debugLog('H4', 'HomeHostController.onInit', {
+      'controllerHash': identityHashCode(this),
+      'sheetControllerHash': identityHashCode(sheetController),
+      'sheetControllerAttached': sheetController.isAttached,
+    });
+    // #endregion
+    mapController.initialize(_allVenues, onVenueFocused);
   }
 
   @override
   void onClose() {
-    sheetProgressNotifier.dispose();
+    // #region agent log
+    _debugLog('H4', 'HomeHostController.onClose', {
+      'controllerHash': identityHashCode(this),
+      'sheetControllerHash': identityHashCode(sheetController),
+      'sheetControllerAttached': sheetController.isAttached,
+    });
+    // #endregion
+    _listingScrollController?.removeListener(_onListingScroll);
+    sheetExtentNotifier.dispose();
     sheetController.dispose();
     super.onClose();
   }
@@ -137,6 +249,72 @@ class HomeHostController extends GetxController {
     _layoutCoordinationDone = true;
     final m = MediaQuery.of(context);
     onSheetExtentChanged(sheetExtent, m.size, m.padding.top);
+  }
+
+  /// When Explore tab is shown again, expand sheet toward max (short curve).
+  void resetSheetExpandedOnExploreVisible() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // #region agent log
+      _debugLog('H3', 'resetSheetExpandedOnExploreVisible callback', {
+        'controllerHash': identityHashCode(this),
+        'sheetControllerHash': identityHashCode(sheetController),
+        'sheetControllerAttached': sheetController.isAttached,
+      });
+      // #endregion
+      if (!sheetController.isAttached) return;
+      unawaited(
+        sheetController.animateTo(
+          listingMaxSize,
+          duration: const Duration(milliseconds: 340),
+          curve: Curves.easeOutCubic,
+        ),
+      );
+    });
+  }
+
+  void attachListingScrollController(ScrollController sc) {
+    if (_listingScrollController == sc) return;
+    _listingScrollController?.removeListener(_onListingScroll);
+    _listingScrollController = sc;
+    _listingScrollController!.addListener(_onListingScroll);
+  }
+
+  void _onListingScroll() {
+    final c = _listingScrollController;
+    if (c == null || !c.hasClients || _loadingMore) return;
+    final max = c.position.maxScrollExtent;
+    if (max <= 0) return;
+    if (c.position.pixels >= max - listingLoadMoreLeadPx) {
+      _loadMoreMock();
+    }
+  }
+
+  Future<void> _loadMoreMock() async {
+    if (_loadingMore) return;
+    _loadingMore = true;
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    _paginationGeneration++;
+    final gen = _paginationGeneration;
+    for (final v in kExploreMockVenues) {
+      _allVenues.add(
+        ExploreVenue(
+          id: '${v.id}_more_${gen}_${_allVenues.length}',
+          name: v.name,
+          area: v.area,
+          city: v.city,
+          sport: v.sport,
+          pricePkr: v.pricePkr,
+          rating: v.rating,
+          reviews: v.reviews,
+          lat: v.lat,
+          lng: v.lng,
+          imageUrl: v.imageUrl,
+        ),
+      );
+    }
+    mapController.initialize(_allVenues, onVenueFocused);
+    _loadingMore = false;
+    update();
   }
 
   Future<void> onVenueFocused(ExploreVenue v) async {
@@ -151,19 +329,28 @@ class HomeHostController extends GetxController {
   }
 
   void onSportFilterSelected(String label) {
-    mapController.applySportFilter(label, kExploreMockVenues, onVenueFocused);
+    mapController.applySportFilter(label, _allVenues, onVenueFocused);
     update();
   }
 
   void onSheetExtentChanged(double extent, Size screenSize, double topPadding) {
     final clamped = extent.clamp(listingMinSize, listingMaxSize);
     sheetExtent = clamped;
+    sheetExtentNotifier.value = clamped;
     final t = normalizedSheetProgress(clamped);
-    sheetProgressNotifier.value = t;
+    // #region agent log
+    _debugLog('H7', 'onSheetExtentChanged_noGetBuilderUpdate', {
+      'controllerHash': identityHashCode(this),
+      'sheetControllerHash': identityHashCode(sheetController),
+      'sheetControllerAttached': sheetController.isAttached,
+      'extent': clamped,
+    });
+    // #endregion
 
     final bottomInset = clamped * screenSize.height;
     mapController.applySheetCoordination(
       sheetProgress: t,
+      extent: clamped,
       padding: EdgeInsets.only(
         left: 0,
         right: 0,
@@ -171,16 +358,15 @@ class HomeHostController extends GetxController {
         bottom: bottomInset,
       ),
     );
-    update();
+    // Do NOT call update() here — it rebuilds the whole Explore tree and can
+    // dispose/recreate [DraggableScrollableSheet] while [sheetController] is still attached.
   }
-
-  bool get showFloatingActions => sheetExtent > listingMinSize + 0.02;
 
   Future<void> collapseSheetToMap() async {
     if (!sheetController.isAttached) return;
     await sheetController.animateTo(
       listingMinSize,
-      duration: const Duration(milliseconds: 280),
+      duration: const Duration(milliseconds: 320),
       curve: Curves.easeOutCubic,
     );
   }
@@ -190,11 +376,46 @@ class HomeHostController extends GetxController {
   }
 
   void onSearchTap() {
+    sessionStayDates = committedStayDates.copy();
     searchSheetOpen = true;
     update();
   }
 
   void closeSearchSheet() {
+    searchSheetOpen = false;
+    sessionStayDates = committedStayDates.copy();
+    update();
+  }
+
+  /// Snapshot [sessionStayDates] before opening the date sheet; paired with [finalizeStayDatePickerSheet].
+  void beginStayDatePickerSnapshot() {
+    _stayDatePickerSnapshot = sessionStayDates.copy();
+  }
+
+  /// After sheet closes: revert to snapshot if user did not tap **Done**.
+  void finalizeStayDatePickerSheet({required bool keepChanges}) {
+    if (!keepChanges && _stayDatePickerSnapshot != null) {
+      sessionStayDates = _stayDatePickerSnapshot!.copy();
+    }
+    _stayDatePickerSnapshot = null;
+    update();
+  }
+
+  /// Updates draft selection from the calendar (temporary until explore **Search** or sheet revert).
+  void saveTemporaryStayDates(StayDateSelection selection) {
+    sessionStayDates = selection;
+    update();
+  }
+
+  void clearSessionStayDates() {
+    sessionStayDates = const StayDateSelection();
+    update();
+  }
+
+  /// Persists session dates to committed state and closes the explore search overlay.
+  void commitExploreSearchAndClose() {
+    committedStayDates = sessionStayDates.copy();
+    searchDateSubtitle = StayDateFormatters.committedSubtitle(committedStayDates);
     searchSheetOpen = false;
     update();
   }
@@ -206,5 +427,19 @@ class HomeHostController extends GetxController {
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
     );
+  }
+
+  /// Called after [buildLocationPickerDialog] returns; updates state + map camera.
+  Future<void> applyLocationPickerResult(Map<String, dynamic>? map) async {
+    final picked = LocationPickerResult.fromMap(map);
+    if (picked == null) return;
+    searchLocationLabel = picked.result;
+    searchLat = picked.lat;
+    searchLng = picked.lng;
+    searchFromCurrentLocation = picked.fromCurrentLocation;
+    if (picked.lat != null && picked.lng != null) {
+      await mapController.animateToLatLng(picked.lat!, picked.lng!);
+    }
+    update();
   }
 }
