@@ -22,9 +22,6 @@ class MapController extends GetxController {
   MapController({required this.sharedPreferences,});
 
   static const LatLng pakistanRoughCenter = LatLng(24.86, 67.01);
-  static List<String> get sportFilters =>
-      SportPickerCatalog.gridItems.map((e) => e.filterValue).toList();
-
   final Completer<GoogleMapController> googleMapController =
       Completer<GoogleMapController>();
 
