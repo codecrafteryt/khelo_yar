@@ -138,7 +138,7 @@ class Account extends StatelessWidget {
           SliverToBoxAdapter(child: SizedBox(height: 24.h)),
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              padding: EdgeInsets.symmetric(horizontal: 10),
               child: Text(
                 'Account settings',
                 style: TextStyle(
@@ -153,7 +153,7 @@ class Account extends StatelessWidget {
           SliverToBoxAdapter(child: SizedBox(height: 12.h)),
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              padding: EdgeInsets.symmetric(horizontal: 10),
               child: _AccountCard(
                 children: [
                   _AccountTile(
@@ -186,7 +186,7 @@ class Account extends StatelessWidget {
           SliverToBoxAdapter(child: SizedBox(height: 28.h)),
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              padding: EdgeInsets.symmetric(horizontal: 14),
               child: Text(
                 'Hosting',
                 style: TextStyle(
@@ -201,7 +201,7 @@ class Account extends StatelessWidget {
           SliverToBoxAdapter(child: SizedBox(height: 12.h)),
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              padding: EdgeInsets.symmetric(horizontal: 14),
               child: _AccountCard(
                 children: [
                   _AccountTile(
@@ -222,7 +222,7 @@ class Account extends StatelessWidget {
           SliverToBoxAdapter(child: SizedBox(height: 28.h)),
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              padding: EdgeInsets.symmetric(horizontal: 14),
               child: Text(
                 'Support',
                 style: TextStyle(
@@ -237,7 +237,7 @@ class Account extends StatelessWidget {
           SliverToBoxAdapter(child: SizedBox(height: 12.h)),
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              padding: EdgeInsets.symmetric(horizontal: 14),
               child: _AccountCard(
                 children: [
                   _AccountTile(
