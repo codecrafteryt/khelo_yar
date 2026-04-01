@@ -12,6 +12,7 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:khelo_yar/controller/auth_controller.dart';
 import 'package:khelo_yar/controller/home_host_controller.dart';
 import 'package:khelo_yar/controller/map_controller.dart';
+import 'package:khelo_yar/controller/searching_controller.dart';
 import 'package:khelo_yar/data/auth_repo/auth_repo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api_provider.dart';
@@ -25,5 +26,6 @@ class DependencyInjection {
     Get.lazyPut(() => AuthController(authRepo: Get.find(), sharedPreferences: Get.find(),), fenix: true,);
     Get.lazyPut(() => MapController(sharedPreferences: Get.find(),), fenix: true,);
     Get.lazyPut(() => HomeHostController(sharedPreferences: Get.find(),), fenix: true,);
+    Get.lazyPut(() => SearchingController(sharedPreferences: Get.find(),), fenix: true,);
   }
 }
