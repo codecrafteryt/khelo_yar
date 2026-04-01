@@ -37,18 +37,7 @@ class SignUpScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            CustomAppBar(
-              leading: CustomLeadingIcon(
-                onPressed: authController.goBack,
-              ),
-              title: Text("Signup",
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: MyFonts.plusJakartaSans,
-                ),
-              ),
-            ),
+
             Center(
               child: SingleChildScrollView(
                 padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h + bottomInset),
@@ -57,7 +46,7 @@ class SignUpScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        10.sbh,
+                        60.sbh,
                         SizedBox(
                           height: 100,
                           width: 100,
@@ -67,7 +56,7 @@ class SignUpScreen extends StatelessWidget {
                             fit: BoxFit.cover,
                           ),
                         ),
-                        17  .sbh,
+                        100.sbh,
                         CustomTextField(
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                           labelText: 'Full name',

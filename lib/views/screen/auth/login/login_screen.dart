@@ -36,15 +36,6 @@ class LoginScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            CustomAppBar(
-              title: Text("Login",
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: MyFonts.plusJakartaSans,
-                ),
-              ),
-            ),
             Center(
               child: SingleChildScrollView(
                 padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h + bottomInset),
@@ -53,7 +44,7 @@ class LoginScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        10.sbh,
+                        60.sbh,
                         SizedBox(
                           height: 100,
                           width: 100,
@@ -63,7 +54,7 @@ class LoginScreen extends StatelessWidget {
                             fit: BoxFit.cover,
                           ),
                         ),
-                        12.sbh,
+                        100.sbh,
                         CustomTextField(
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                           labelText: 'Email',
