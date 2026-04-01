@@ -15,6 +15,7 @@ import 'package:khelo_yar/controller/map_controller.dart';
 import 'package:khelo_yar/controller/searching_controller.dart';
 import 'package:khelo_yar/data/auth_repo/auth_repo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../controller/listing_detail_controller.dart';
 import '../api_provider.dart';
 
 class DependencyInjection {
@@ -27,5 +28,6 @@ class DependencyInjection {
     Get.lazyPut(() => MapController(sharedPreferences: Get.find(),), fenix: true,);
     Get.lazyPut(() => HomeHostController(sharedPreferences: Get.find(),), fenix: true,);
     Get.lazyPut(() => SearchingController(sharedPreferences: Get.find(),), fenix: true,);
+    Get.lazyPut(() => ListingDetailController(sharedPreferences: Get.find(),), fenix: true,);
   }
 }
